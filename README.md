@@ -1,8 +1,8 @@
 # tlsh_foobar
-Fuzzy matching webserver based on TLSH library
+Fuzzy matching webserver based on TLSH library.
 
-Based on Trend Micro Locality Sensitive Hash (https://github.com/trendmicro/tlsh) and the Golang Lib from https://github.com/glaslos/tlsh.
-This tool would not work without the public available data from MalwareBazaar (https://bazaar.abuse.ch/export/)!
+Tool is build based on Trend Micro Locality Sensitive Hash (https://github.com/trendmicro/tlsh) and the Golang Lib from https://github.com/glaslos/tlsh.
+This tool would not work without the public available data from MalwareBazaar - https://bazaar.abuse.ch/ !
 
 The idea behind this tool is to send ,,new-file" creation events from a monitored directory (with the TLSH) to the tlshServer and get some results back if the distance is <150.
 For detailed information about TLSH please see https://github.com/trendmicro/tlsh, for more usecases you may also watch Enhancing Malware Code Similarity Detection through Vectorsearch and TLSH on https://www.youtube.com/watch?v=W_r6Unpr8ZA. 
