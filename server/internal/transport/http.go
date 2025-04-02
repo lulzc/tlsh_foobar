@@ -4,13 +4,9 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"tlsh_foobar/server/internal/models"
 	"tlsh_foobar/server/internal/tlsh_foo"
 )
-
-type TlshItem struct {
-	Name string `json:"name"`
-	Hash string `json:"hash"`
-}
 
 type Server struct {
 	mux *http.ServeMux
@@ -32,14 +28,14 @@ func NewServer(tlshSvc *tlsh_foo.Service) *Server {
 
 	// curl -i -X POST --data '{"name":"derName","hash":"T12345"}'  http://localhost:8080/tlsh
 	mux.HandleFunc("POST /tlsh", func(writer http.ResponseWriter, request *http.Request) {
-		var t TlshItem
+		var t models.Item
 		err := json.NewDecoder(request.Body).Decode(&t)
 		if err != nil {
 			log.Println(err)
 			writer.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		tlshSvc.Add(t.Name, t.Hash)
+		tlshSvc.Add(t.Name, t.Hash, t.Signature)
 
 		writer.WriteHeader(http.StatusCreated)
 		return

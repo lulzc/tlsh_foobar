@@ -7,36 +7,26 @@ import (
 	"log"
 	"os"
 	"strings"
+	"tlsh_foobar/server/internal/models"
 )
 
-type Item struct {
-	Name      string `json:"name"`
-	Hash      string `json:"hash"`
-	Signature string `json:"signature"`
-}
-
-// Result todo: review if store result in Item is better?
-type Result struct {
-	Distance  int    `json:"distance"`
-	Signature string `json:"signature"`
-}
-
 type Service struct {
-	tlshitem []Item
+	tlshitem []models.Item
 }
 
 func NewService() *Service {
 	return &Service{
-		tlshitem: make([]Item, 0),
+		tlshitem: make([]models.Item, 0),
 	}
 
 }
 
-func (svc *Service) Add(name string, hash string) {
+func (svc *Service) Add(name string, hash string, signature string) {
 
-	svc.tlshitem = append(svc.tlshitem, Item{
-		Name: name,
-		Hash: hash,
+	svc.tlshitem = append(svc.tlshitem, models.Item{
+		Name:      name,
+		Hash:      hash,
+		Signature: signature,
 	})
 }
 
@@ -50,8 +40,8 @@ func (svc *Service) Search(query string) []string {
 	return results
 }
 
-func (svc *Service) Distance(query string) []Result {
-	var results []Result
+func (svc *Service) Distance(query string) []models.Result {
+	var results []models.Result
 
 	// generate TLSH hash from the query string
 	q, err := tlsh.HashBytes([]byte(query))
@@ -72,20 +62,19 @@ func (svc *Service) Distance(query string) []Result {
 		distance := q.Diff(compareHash)
 		// only store results with distance smaller than 150
 		if distance < 150 {
-			results = append(results, Result{Distance: distance, Signature: item.Signature})
+			results = append(results, models.Result{Distance: distance, Signature: item.Signature})
 		}
 
 	}
-
 	return results
 }
 
-func (svc *Service) GetAll() []Item {
+func (svc *Service) GetAll() []models.Item {
 	return svc.tlshitem
 }
 
-// ReadCsv reads data from MalwareBazaar csv file and populates the Service's tlshitem
-func (s *Service) ReadCsv(csvFile string) {
+// reads the data from MalwareBazaar csv file
+func (svc *Service) ReadCsv(csvFile string) {
 
 	file, err := os.Open(csvFile)
 	if err != nil {
@@ -112,15 +101,18 @@ func (s *Service) ReadCsv(csvFile string) {
 		}
 
 		// sanitize and remove double quotes to make the json response more pretty
-		r := Item{
-			Hash:      strings.ReplaceAll(record[13], "\"", ""),
+
+		r := models.Item{
 			Name:      strings.ReplaceAll(record[5], "\"", ""),
 			Signature: strings.ReplaceAll(record[8], "\"", ""),
+			Hash:      strings.ReplaceAll(record[13], "\"", ""),
 		}
 
-		s.tlshitem = append(s.tlshitem, r)
+		svc.tlshitem = append(svc.tlshitem, r)
+
 	}
-	// for debug print all items from the csv
-	//log.Printf("%v\n", s.tlshitem)
+
+	// for debug print all items from the csv in the console
+	// log.Printf("%v\n", s.tlshitem)
 
 }

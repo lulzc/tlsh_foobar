@@ -27,7 +27,7 @@ func main() {
 	svc := tlsh_foo.NewService()
 	server := transport.NewServer(svc)
 
-	//var csvFile = "./server/internal/db/sqlite.db"
+	//var csvFile = "./server/internal/db/full.csv"
 	svc.ReadCsv(csvFile)
 
 	if err := server.Serve(); err != nil {
